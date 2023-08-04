@@ -1,14 +1,18 @@
 import requests
 import datetime
+import base64
+import os
 
-APP_ID = "e2f60d41"
-API_KEY = "a1dc13ee26779ef2d33c39b09e835282"
+APP_ID = os.environ.get("APP_ID")
+API_KEY = os.environ.get("API_KEY")
+USERNAME = os.environ.get('USERNAME')
+PASSWORD = os.environ.get('PASSWORD')
 WEIGHT = 70
 AGE = 38
 GENDER = 'male'
 
 url_end_point = "https://trackapi.nutritionix.com/v2/natural/exercise"
-sheet_endpoint = "https://api.sheety.co/4f36951749eb4b5bf9f4ed2b117df48b/sheetyWorkouts/workouts"
+sheet_endpoint = os.environ.get("sheet_endpoint")
 user_input = input("Please enter your final activity: ")
 
 headers = {
@@ -30,7 +34,6 @@ now = datetime.datetime.now()
 current_day = now.strftime("%d/%m/%Y")
 current_time = now.strftime("%H:%M:%S")
 
-
 for exercise in result['exercises']:
     sheet_params = {
         "workout": {
@@ -41,5 +44,11 @@ for exercise in result['exercises']:
             "calories": exercise["nf_calories"]
         }
     }
-    sheet_response = requests.post(url=sheet_endpoint, json=sheet_params)
+    sheet_response = requests.post(url=sheet_endpoint,
+                                   json=sheet_params,
+                                   auth=(
+                                       USERNAME,
+                                       PASSWORD
+                                   )
+                                   )
     print(sheet_response.text)
